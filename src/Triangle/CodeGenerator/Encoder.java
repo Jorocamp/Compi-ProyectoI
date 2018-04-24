@@ -40,6 +40,8 @@ import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
 import Triangle.AbstractSyntaxTrees.Declaration;
+import Triangle.AbstractSyntaxTrees.DoUntilCommand;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -84,14 +86,17 @@ import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
 import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
+import Triangle.AbstractSyntaxTrees.UntilCommand;
 import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
+import Triangle.AbstractSyntaxTrees.VarInitialization;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
 import Triangle.SyntacticAnalyzer.PrivateDeclaration;
+
 
 public final class Encoder implements Visitor {
 
@@ -163,6 +168,18 @@ public final class Encoder implements Visitor {
     ast.E.visit(this, frame);
     emit(Machine.JUMPIFop, Machine.trueRep, Machine.CBr, loopAddr);
     return null;
+  }
+  
+  public Object visitUntilCommand(UntilCommand ast, Object o){
+      return null;
+  }
+  
+    public Object visitDoUntilCommand(DoUntilCommand ast, Object o){
+      return null;
+  }
+    
+   public Object visitDoWhileCommand(DoWhileCommand ast, Object o){
+      return null;
   }
 
 
@@ -357,6 +374,10 @@ public final class Encoder implements Visitor {
   public Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast,
 					      Object o) {
     return new Integer(0);
+  }
+  
+  public Object visitVarInitialization(VarInitialization ast, Object o) {
+      return new Integer(0);
   }
 
   public Object visitVarDeclaration(VarDeclaration ast, Object o) {
