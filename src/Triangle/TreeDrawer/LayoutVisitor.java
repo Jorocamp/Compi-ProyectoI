@@ -32,6 +32,8 @@ import Triangle.AbstractSyntaxTrees.CharacterLiteral;
 import Triangle.AbstractSyntaxTrees.ConstActualParameter;
 import Triangle.AbstractSyntaxTrees.ConstDeclaration;
 import Triangle.AbstractSyntaxTrees.ConstFormalParameter;
+import Triangle.AbstractSyntaxTrees.DoUntilCommand;
+import Triangle.AbstractSyntaxTrees.DoWhileCommand;
 import Triangle.AbstractSyntaxTrees.DotVname;
 import Triangle.AbstractSyntaxTrees.EmptyActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.EmptyCommand;
@@ -49,6 +51,7 @@ import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LoopForCommand;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
 import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
@@ -59,6 +62,7 @@ import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
@@ -74,12 +78,15 @@ import Triangle.AbstractSyntaxTrees.SubscriptVname;
 import Triangle.AbstractSyntaxTrees.TypeDeclaration;
 import Triangle.AbstractSyntaxTrees.UnaryExpression;
 import Triangle.AbstractSyntaxTrees.UnaryOperatorDeclaration;
+import Triangle.AbstractSyntaxTrees.UntilCommand;
 import Triangle.AbstractSyntaxTrees.VarActualParameter;
 import Triangle.AbstractSyntaxTrees.VarDeclaration;
 import Triangle.AbstractSyntaxTrees.VarFormalParameter;
+import Triangle.AbstractSyntaxTrees.VarInitialization;
 import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+import Triangle.SyntacticAnalyzer.PrivateDeclaration;
 
 public class LayoutVisitor implements Visitor {
 
@@ -113,12 +120,28 @@ public class LayoutVisitor implements Visitor {
     return layoutBinary("LetCom.", ast.D, ast.C);
   }
 
+  public Object visitLoopForCommand(LoopForCommand ast, Object obj){
+      return layoutQuaternary("LoopForCom.",ast.I, ast.E1, ast.E2, ast.C);
+  }
   public Object visitSequentialCommand(SequentialCommand ast, Object obj) {
     return layoutBinary("Seq.Com.", ast.C1, ast.C2);
   }
 
   public Object visitWhileCommand(WhileCommand ast, Object obj) {
     return layoutBinary("WhileCom.", ast.E, ast.C);
+  }
+  
+  public Object visitUntilCommand(UntilCommand ast, Object obj) {
+    return layoutBinary("UntilCom.", ast.E, ast.C);
+  }
+  
+    public Object visitDoUntilCommand(DoUntilCommand ast, Object obj) {
+    return layoutBinary("DoUntilCom.", ast.C, ast.E);
+  }
+    
+    
+   public Object visitDoWhileCommand(DoWhileCommand ast, Object obj) {
+    return layoutBinary("DoWhileCom.", ast.C, ast.E);
   }
 
 
@@ -180,11 +203,19 @@ public class LayoutVisitor implements Visitor {
   public Object visitFuncDeclaration(FuncDeclaration ast, Object obj) {
     return layoutQuaternary("FuncDecl.", ast.I, ast.FPS, ast.T, ast.E);
   }
-
+  
+  public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o){
+      return layoutBinary("PrivateDecl.", ast.D1, ast.D2);
+  }
+  
   public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
     return layoutTernary("ProcDecl.", ast.I, ast.FPS, ast.C);
   }
-
+  
+  public Object visitRecDeclaration(RecDeclaration ast, Object o){
+      return layoutUnary("RecDecl.", ast.D);
+  }
+  
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {
     return layoutBinary("Seq.Decl.", ast.D1, ast.D2);
   }
@@ -196,6 +227,11 @@ public class LayoutVisitor implements Visitor {
   public Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast, Object obj) {
     return layoutTernary("UnaryOp.Decl.", ast.O, ast.ARG, ast.RES);
   }
+  
+    public Object visitVarInitialization(VarInitialization ast, Object o) {
+      return layoutBinary("VarIni.", ast.I, ast.E);
+  }
+
 
   public Object visitVarDeclaration(VarDeclaration ast, Object obj) {
     return layoutBinary("VarDecl.", ast.I, ast.T);

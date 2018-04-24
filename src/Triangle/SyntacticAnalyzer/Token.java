@@ -110,10 +110,11 @@ final class Token extends Object {
     LCURLY		= 40,
     RCURLY		= 41,
 
+
     // special tokens...
     EOT			= 42,
     ERROR		= 43;
-    
+
 
   private static String[] tokenTable = new String[] {
     "<int>",
