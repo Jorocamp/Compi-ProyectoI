@@ -263,6 +263,33 @@ public class Parser {
     }
     return commandAST;
   }
+  
+  public Command auxiliar() throws SyntaxError{
+        Command commandAST = null;
+        SourcePosition commandPos = new SourcePosition();
+        start(commandPos);
+
+        acceptIt();
+        Expression eAST = parseExpression();
+        accept(Token.THEN);
+        Command c1AST = parseCommand();
+
+        Command c2AST = null;
+      
+        if(currentToken.kind == Token.ELSE){
+            accept(Token.ELSE);
+            c2AST = parseCommand();
+            accept(Token.END);
+            finish(commandPos);
+            commandAST = new IfCommand(eAST, c1AST, c2AST, commandPos);
+        }else if(currentToken.kind == Token.ELSIF){
+            finish(commandPos);
+            //c2AST  = new ElsifCommand(eAST, c1AST, commandPos);
+            commandAST = new IfCommand(eAST, c1AST, auxiliar(), commandPos);
+        }
+
+        return commandAST;
+  }
 
   Command parseSingleCommand() throws SyntaxError {
     Command commandAST = null; // in case there's a syntactic error
@@ -293,18 +320,13 @@ public class Parser {
       }
       break;
 
-    case Token.BEGIN:
-      acceptIt();
-      commandAST = parseCommand();
-      accept(Token.END);
-      break;
-
     case Token.LET:
       {
         acceptIt();
         Declaration dAST = parseDeclaration();
         accept(Token.IN);
-        Command cAST = parseSingleCommand();
+        Command cAST = parseCommand();
+        accept(Token.END);
         finish(commandPos);
         commandAST = new LetCommand(dAST, cAST, commandPos);
       }
@@ -315,14 +337,22 @@ public class Parser {
         acceptIt();
         Expression eAST = parseExpression();
         accept(Token.THEN);
-        Command c1AST = parseSingleCommand();
-        accept(Token.ELSE);
-        Command c2AST = parseSingleCommand();
-        finish(commandPos);
-        commandAST = new IfCommand(eAST, c1AST, c2AST, commandPos);
+        Command c1AST = parseCommand();
+        
+        Command c2AST = null;
+        
+        if(currentToken.kind == Token.ELSE){
+            accept(Token.ELSE);
+            c2AST = parseCommand();
+            accept(Token.END);
+            finish(commandPos);
+            commandAST = new IfCommand(eAST, c1AST, c2AST, commandPos);
+        }else if(currentToken.kind == Token.ELSIF){
+            commandAST = new IfCommand(eAST, c1AST, auxiliar(), commandPos);
+        }
       }
       break;
-
+        
     case Token.WHILE:
       {
         acceptIt();
@@ -351,7 +381,7 @@ public class Parser {
     finish(commandPos);
     commandAST = new EmptyCommand(commandPos);
     
-    break;    
+    break;   
     
     default:
       syntacticError("\"%\" cannot start a command",
@@ -918,13 +948,23 @@ public class Parser {
       break;
 
     case Token.ARRAY:
-      {
+      {     
         acceptIt();
         IntegerLiteral ilAST = parseIntegerLiteral();
+        IntegerLiteral ilAST2 = null;
+        if(currentToken.kind == Token.DOTDOT){
+            accept(Token.DOTDOT);
+            ilAST2 = parseIntegerLiteral();
+        }
         accept(Token.OF);
         TypeDenoter tAST = parseTypeDenoter();
         finish(typePos);
-        typeAST = new ArrayTypeDenoter(ilAST, tAST, typePos);
+        if(currentToken.kind == Token.DOTDOT){
+            typeAST = new ArrayTypeDenoter(ilAST, ilAST2, tAST, typePos);
+        }else{
+            typeAST = new ArrayTypeDenoter(ilAST, tAST, typePos);
+        }
+        
       }
       break;
 

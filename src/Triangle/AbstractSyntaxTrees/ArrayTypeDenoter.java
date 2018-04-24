@@ -24,6 +24,14 @@ public class ArrayTypeDenoter extends TypeDenoter {
     IL = ilAST;
     T = tAST;
   }
+    
+  public ArrayTypeDenoter (IntegerLiteral ilAST, IntegerLiteral ilAST2, TypeDenoter tAST,
+                    SourcePosition thePosition) {
+    super (thePosition);
+    IL = ilAST;
+    IL2 = ilAST2;
+    T = tAST;
+  }
 
   public Object visit(Visitor v, Object o) {
     return v.visitArrayTypeDenoter(this, o);
@@ -40,5 +48,6 @@ public class ArrayTypeDenoter extends TypeDenoter {
   }
 
   public IntegerLiteral IL;
+  public IntegerLiteral IL2;
   public TypeDenoter T;
 }

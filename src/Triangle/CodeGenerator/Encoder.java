@@ -112,7 +112,7 @@ public final class Encoder implements Visitor {
   public Object visitEmptyCommand(EmptyCommand ast, Object o) {
     return null;
   }
-
+  
   public Object visitIfCommand(IfCommand ast, Object o) {
     Frame frame = (Frame) o;
     int jumpifAddr, jumpAddr;
