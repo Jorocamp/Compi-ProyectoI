@@ -57,6 +57,7 @@ import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LoopForCommand;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
 import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
@@ -67,6 +68,7 @@ import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
@@ -89,6 +91,7 @@ import Triangle.AbstractSyntaxTrees.Visitor;
 import Triangle.AbstractSyntaxTrees.Vname;
 import Triangle.AbstractSyntaxTrees.VnameExpression;
 import Triangle.AbstractSyntaxTrees.WhileCommand;
+import Triangle.SyntacticAnalyzer.PrivateDeclaration;
 
 public final class Encoder implements Visitor {
 
@@ -138,6 +141,10 @@ public final class Encoder implements Visitor {
     return null;
   }
 
+  public Object visitLoopForCommand(LoopForCommand ast, Object o){
+      return null;
+  }
+  
   public Object visitSequentialCommand(SequentialCommand ast, Object o) {
     ast.C1.visit(this, o);
     ast.C2.visit(this, o);
@@ -300,6 +307,10 @@ public final class Encoder implements Visitor {
     patch(jumpAddr, nextInstrAddr);
     return new Integer(0);
   }
+  
+  public Object visitPrivateDeclaration(PrivateDeclaration ast, Object o){
+      return new Integer(0);
+  }
 
   public Object visitProcDeclaration(ProcDeclaration ast, Object o) {
     Frame frame = (Frame) o;
@@ -321,6 +332,10 @@ public final class Encoder implements Visitor {
     emit(Machine.RETURNop, 0, 0, argsSize);
     patch(jumpAddr, nextInstrAddr);
     return new Integer(0);
+  }
+  
+  public Object visitRecDeclaration(RecDeclaration ast, Object o){
+      return new Integer(0);
   }
 
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object o) {

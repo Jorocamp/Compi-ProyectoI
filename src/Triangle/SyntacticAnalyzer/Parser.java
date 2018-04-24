@@ -49,6 +49,7 @@ import Triangle.AbstractSyntaxTrees.IntegerExpression;
 import Triangle.AbstractSyntaxTrees.IntegerLiteral;
 import Triangle.AbstractSyntaxTrees.LetCommand;
 import Triangle.AbstractSyntaxTrees.LetExpression;
+import Triangle.AbstractSyntaxTrees.LoopForCommand;
 import Triangle.AbstractSyntaxTrees.MultipleActualParameterSequence;
 import Triangle.AbstractSyntaxTrees.MultipleArrayAggregate;
 import Triangle.AbstractSyntaxTrees.MultipleFieldTypeDenoter;
@@ -59,6 +60,7 @@ import Triangle.AbstractSyntaxTrees.ProcActualParameter;
 import Triangle.AbstractSyntaxTrees.ProcDeclaration;
 import Triangle.AbstractSyntaxTrees.ProcFormalParameter;
 import Triangle.AbstractSyntaxTrees.Program;
+import Triangle.AbstractSyntaxTrees.RecDeclaration;
 import Triangle.AbstractSyntaxTrees.RecordAggregate;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
@@ -309,7 +311,24 @@ public class Parser {
         commandAST = new LetCommand(dAST, cAST, commandPos);
       }
       break;
-
+      
+    case Token.LOOP:
+      {// "loop" "for" Identifier ":=" Expression "to" Expression "do" Command "end" 
+        acceptIt();
+        accept(Token.FOR);
+        Identifier iAST= parseIdentifier();
+        accept(Token.BECOMES);
+        Expression e1AST = parseExpression();
+        accept(Token.TO);
+        Expression e2AST = parseExpression();
+        accept(Token.DO);
+        Command cAST = parseCommand();
+        accept(Token.END);
+        finish(commandPos);
+        commandAST = new LoopForCommand(iAST, e1AST, e2AST, cAST, commandPos);
+      }
+      break;
+      
     case Token.IF:
       {
         acceptIt();
@@ -586,14 +605,16 @@ public class Parser {
 ///////////////////////////////////////////////////////////////////////////////
 
   Declaration parseDeclaration() throws SyntaxError {
+      System.out.println("En Declaration.");
     Declaration declarationAST = null; // in case there's a syntactic error
 
     SourcePosition declarationPos = new SourcePosition();
     start(declarationPos);
-    declarationAST = parseSingleDeclaration();
+    declarationAST = parseCompoundDeclaration();
     while (currentToken.kind == Token.SEMICOLON) {
+        System.out.println("Otras Declarations...");
       acceptIt();
-      Declaration d2AST = parseSingleDeclaration();
+      Declaration d2AST = parseCompoundDeclaration();
       finish(declarationPos);
       declarationAST = new SequentialDeclaration(declarationAST, d2AST,
         declarationPos);
@@ -602,6 +623,7 @@ public class Parser {
   }
 
   Declaration parseSingleDeclaration() throws SyntaxError {
+      System.out.println("En Parse Single Declaration.");
     Declaration declarationAST = null; // in case there's a syntactic error
 
     SourcePosition declarationPos = new SourcePosition();
@@ -633,6 +655,7 @@ public class Parser {
 
     case Token.PROC:
       {
+          System.out.println("En PROC de PSD.");
         acceptIt();
         Identifier iAST = parseIdentifier();
         accept(Token.LPAREN);
@@ -647,6 +670,7 @@ public class Parser {
 
     case Token.FUNC:
       {
+          System.out.println("En FUNC de PSD.");
         acceptIt();
         Identifier iAST = parseIdentifier();
         accept(Token.LPAREN);
@@ -682,6 +706,120 @@ public class Parser {
     return declarationAST;
   }
 
+// PROC FUNC
+  Declaration parseProcFuncDeclaration() throws SyntaxError {
+      System.out.println("En PROC FUNC.");
+    Declaration declarationAST = null; // in case there's a syntactic error
+
+    SourcePosition declarationPos = new SourcePosition();
+    start(declarationPos);
+      
+    switch (currentToken.kind){
+        
+    case Token.PROC:
+      {
+          System.out.println("En PROC de PFD.");
+        acceptIt();
+        Identifier iAST = parseIdentifier();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.IS);
+        Command cAST = parseCommand();
+        accept(Token.END);
+        finish(declarationPos);
+        declarationAST = new ProcDeclaration(iAST, fpsAST, cAST, declarationPos);
+      }
+      break;
+
+    case Token.FUNC:
+      {
+        acceptIt();
+        Identifier iAST = parseIdentifier();
+        accept(Token.LPAREN);
+        FormalParameterSequence fpsAST = parseFormalParameterSequence();
+        accept(Token.RPAREN);
+        accept(Token.COLON);
+        TypeDenoter tAST = parseTypeDenoter();
+        accept(Token.IS);
+        Expression eAST = parseExpression();
+        finish(declarationPos);
+        declarationAST = new FuncDeclaration(iAST, fpsAST, tAST, eAST,
+          declarationPos);
+      }
+      break;
+      
+    default:
+      syntacticError("\"%\" cannot start a declaration",
+        currentToken.spelling);
+      break;
+    }
+    return declarationAST;
+  }
+
+// PROC FUNCS
+  Declaration parseProcFuncSDeclaration() throws SyntaxError {
+      System.out.println("En PROC FUNCS.");
+    Declaration declarationAST = null; // in case there's a syntactic error
+
+    SourcePosition declarationPos = new SourcePosition();
+    start(declarationPos);
+    
+    declarationAST = parseProcFuncDeclaration();// parsea el primer ProcFunc
+    do{
+        accept(Token.AND);// acepta el "and"
+        Declaration d2AST = parseProcFuncDeclaration(); // parsea el proximo ProcFunc
+        finish(declarationPos);
+        declarationAST = new SequentialDeclaration(declarationAST, d2AST, declarationPos); // crea el anidamiento de ProcFuncs
+    }
+    while(currentToken.kind == Token.AND); // si la declaracion fue ProcFunc y si sigue un "and" 
+
+    return declarationAST;
+  }
+
+// COMPOUND DECLARATION
+  Declaration parseCompoundDeclaration() throws SyntaxError {
+      System.out.println("En Compound Declaration.");
+    Declaration declarationAST = null; // in case there's a syntactic error
+
+    SourcePosition declarationPos = new SourcePosition();
+    start(declarationPos);
+
+    switch (currentToken.kind){
+        case Token.REC:
+          {
+              System.out.println("En REC de CD.");
+              acceptIt();
+              Declaration dAST = parseProcFuncSDeclaration();
+              accept(Token.END);
+              finish(declarationPos);
+              declarationAST = new RecDeclaration(dAST, declarationPos);
+          }
+          break;
+          
+        case Token.PRIVATE:
+          {
+              System.out.println("En PRIVATE de CD.");
+              acceptIt();
+              Declaration d1AST = parseDeclaration();
+              accept(Token.IN);
+              Declaration d2AST = parseDeclaration();
+              accept(Token.END);
+              finish(declarationPos);
+              declarationAST = new PrivateDeclaration(d1AST, d2AST, declarationPos);
+          }
+          break;
+          
+        default:
+        {
+            System.out.println("En default de CD.");
+          declarationAST = parseSingleDeclaration();
+        }
+          break;
+    }
+    return declarationAST;
+  }
+  
 ///////////////////////////////////////////////////////////////////////////////
 //
 // PARAMETERS

@@ -14,6 +14,8 @@
 
 package Triangle.AbstractSyntaxTrees;
 
+import Triangle.SyntacticAnalyzer.PrivateDeclaration;
+
 public interface Visitor {
 
   // Commands
@@ -22,6 +24,7 @@ public interface Visitor {
   public abstract Object visitEmptyCommand(EmptyCommand ast, Object o);
   public abstract Object visitIfCommand(IfCommand ast, Object o);
   public abstract Object visitLetCommand(LetCommand ast, Object o);
+  public abstract Object visitLoopForCommand(LoopForCommand ast, Object o);
   public abstract Object visitSequentialCommand(SequentialCommand ast, Object o);
   public abstract Object visitWhileCommand(WhileCommand ast, Object o);
 
@@ -43,7 +46,9 @@ public interface Visitor {
   public abstract Object visitBinaryOperatorDeclaration(BinaryOperatorDeclaration ast, Object o);
   public abstract Object visitConstDeclaration(ConstDeclaration ast, Object o);
   public abstract Object visitFuncDeclaration(FuncDeclaration ast, Object o);
+  public abstract Object visitPrivateDeclaration(PrivateDeclaration ast, Object o);
   public abstract Object visitProcDeclaration(ProcDeclaration ast, Object o);
+  public abstract Object visitRecDeclaration(RecDeclaration ast, Object o);
   public abstract Object visitSequentialDeclaration(SequentialDeclaration ast, Object o);
   public abstract Object visitTypeDeclaration(TypeDeclaration ast, Object o);
   public abstract Object visitUnaryOperatorDeclaration(UnaryOperatorDeclaration ast, Object o);
