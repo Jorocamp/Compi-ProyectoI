@@ -22,7 +22,6 @@ public abstract class AST {
   public AST (SourcePosition thePosition) {
     position = thePosition;
     entity = null;
-    System.out.println("HOLA");
   }
 
   public SourcePosition getPosition() {
